@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Esercitazione2</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        
+        <!-- Titolo -->
+        <h1>Registrazione esami triennale e magistrale</h1>
+        
+        <!-- Test Immagine -->
+        <img src="img\DSCF4184.JPG" title="Cagliari" alt="Comune Cagliari" width="200" height="150">
+        
+        
+        <!-- Form -->
+        <form method="GET">
+            <!-- Nome, Cognome, Matricola studente -->
+            <div>
+                <br><br>
+                <label for="NomeStudente">Nome Studente</label> 
+                <input type="text" name="NomeStudente" id="NomeStudente">
+                <label for="CognomeStudente">Cognome Studente</label> 
+                <input type="text" name="CognomeStudente" id="CognomeStudente">
+                <label for="MatricolaStudente">Matricola Studente</label> 
+                <input type="number" name="MatricolaStudente" id="MatricolaStudente"> 
+                <br><br>
+            </div>
+            <!-- Lista esami e voto -->
+            <div>
+                <label for="ListaEsami">Lista Esami</label>
+                <select size="3" name="ListaEsami" id="ListaEsami">
+                    <option value="PR1">Programmazione 1</option>
+                    <option value="PR2">Programmazione 2</option>
+                    <option value="AMM">Amministrazione di Sistema</option>
+                    <option value="EAI">Elaborazione di immagini</option>
+                    <option value="FS">Fondamenti di Sistema</option>
+                    <option value="ARE2">Architettura degli elaboratori 2</option>
+                </select>
+                <label for="voto">Voto</label>
+                <input type="range" min="18" max="31" name="voto" id="voto">
+            </div>
+            
+            <!-- Descrizione -->
+            <div>
+                <br><br>
+                <label for="Descrizione">Descrizione</label>
+                <textarea name="Descrizione" id="Descrizione" cols="40" rows="10">Descrizione Esame</textarea>
+            </div>
+            <!-- Pulsanti submit e reset -->
+            <br>
+            <div>
+                <input type="submit" value="Invia">
+                <input type="reset" value="Cancella">
+            </div>
+            
+        </form> 
+        
+        
+        
+        
+        
+        
+    </body>
+</html>
