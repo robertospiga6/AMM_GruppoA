@@ -9,8 +9,39 @@ and open the template in the editor.
         <title>venditore</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="keywords" content="HTML, AMAZON, e-commerce, venditore">
+        <meta name="description" content="Milestone1">
+        <meta name="author" content="Roberto Spiga">
     </head>
     <body>
-        <div>TODO write content</div>
+        <div id="form" class="input-form">
+            <form method="POST">
+                <br>
+                <label for="nome">Nome oggetto</label> 
+                <input type="text" name="nome" id="nome">
+                
+                <label for="img">Url Immagine</label> 
+                <input type="url" name="img" id="img">
+                
+                <br><br>
+                <label for="Descrizione">Descrizione Oggetto</label>
+                <br>
+                <textarea name="Descrizione" id="Descrizione" cols="40" rows="10">Descrizione Oggetto</textarea>
+                
+                <label for="prezzo">Prezzo Oggetto</label> 
+                <input type="number" name="prezzo" id="prezzo">
+                
+                <label for="disponibili">Quantit&agrave; Disponibile</label> 
+                <input type="number" name="disponibili" id="disponibili">
+                
+                <input type="submit" value="Accedi" />
+                <br><br>
+            </form>
+        </div>
+        
+        <nav id="navbar">
+            <a href="descrizione.html"><h3>Descrizione</h3></a>
+            <a href="login.html"><h3>Login</h3></a>
+        </nav>
     </body>
 </html>
