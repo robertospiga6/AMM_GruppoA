@@ -14,14 +14,15 @@ and open the template in the editor.
         <meta name="author" content="Roberto Spiga">
     </head>
     <body>
+        <h1>Aggiungi Prodotti</h1>
         <div id="form" class="input-form">
             <form method="POST">
                 <br>
                 <label for="nome">Nome oggetto</label> 
                 <input type="text" name="nome" id="nome">
                 
-                <label for="img">Url Immagine</label> 
-                <input type="url" name="img" id="img">
+                <label for="file">Immagine Prodotto </label>
+                <input type="file" name="file" id="file"/>
                 
                 <br><br>
                 <label for="Descrizione">Descrizione Oggetto</label>
@@ -34,7 +35,8 @@ and open the template in the editor.
                 <label for="disponibili">Quantit&agrave; Disponibile</label> 
                 <input type="number" name="disponibili" id="disponibili">
                 
-                <input type="submit" value="Accedi" />
+                <input type="submit" value="Invia"/>
+                <input type="reset" value="Reimposta"/>
                 <br><br>
             </form>
         </div>
