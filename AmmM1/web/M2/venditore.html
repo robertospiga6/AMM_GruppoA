@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>venditore</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="keywords" content="HTML, AMAZON, e-commerce, venditore">
+        <meta name="description" content="Milestone1">
+        <meta name="author" content="Roberto Spiga">
+        <link href="style.css" rel="stylesheet" type="text/css" media="screen" />
+    </head>
+    <body id="venditore">
+        <!-- Container -->
+        <div class="container">
+            
+            <!-- Header -->
+            <div class="header">
+                <h1>Aggiungi Prodotti</h1>
+            </div>
+            
+            <!-- Content -->
+            <div class="content">
+                <div class="labels">
+                    <label for="nome" class="labelsform">Nome oggetto</label> 
+                    <label for="file" class="labelsform">Immagine Prodotto </label>
+                    <label for="descrizione" class="labelsform">Descrizione Oggetto</label>
+                    <label for="prezzo" class="labelsform2">Prezzo Oggetto</label> 
+                    <label for="disponibili" class="labelsform">Quantit&agrave; Disponibile</label>
+                </div>
+                <div class="inputs">
+                    <form method="POST"> 
+                        <input type="text" name="nome" id="nome" class="notButton">
+                        <input type="file" name="file" id="file" class="notButton"/>
+                        <textarea name="descrizione" id="tAdescrizione" cols="40" rows="10" class="notButton">Descrizione Oggetto</textarea>
+                        <input type="number" name="prezzo" id="prezzo" class="notButton">
+                        <input type="number" name="disponibili" id="disponibili" class="notButton">
+                        <input type="submit" value="Invia"/> 
+                        <input type="reset" value="Reimposta"/> 
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <a href="descrizione.html">Descrizione</a>
+                <a href="login.html">Login</a>
+            </div>
+            
+            <!-- Footer -->
+            <!--
+            <div class="footer">
+                Footer
+            </div>
+            -->
+            
+        </div>
+        
+    </body>
+</html>
