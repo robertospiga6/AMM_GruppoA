@@ -28,7 +28,7 @@ h1,h2,h3 {
     border-style: solid;
 }
 .sidebar {
-    width: 20%;               /*cambia solo sotto i 480px*/
+    width: 20%;              /*cambia solo sotto i 480px*/
     text-align: center;
     font-size: 15px;  
     border-width: 2px;
