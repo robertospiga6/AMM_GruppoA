@@ -37,19 +37,19 @@ and open the template in the editor.
                     <label for="password">Password</label>
                 </div>
                 <div class="inputs">
-                    <form method="POST"> 
+                    <form method="POST" action="../Login"> 
                         <input class="notButton" type="text" name="Username" id="username">
                         <input type="password" name="Password" id="password">
-                        <input type="Submit" value="Accedi"/>
+                        <input type="Submit" name="Submit" value="Accedi"/>
                     </form>
                 </div>
             </div>
             
             <!-- Sidebar -->
             <div class="sidebar">
-                <a href="descrizione.html">Descrizione</a>
-                <a href="cliente.html">Cliente</a>
-                <a href="venditore.html">Venditore</a>
+                <a href="descrizione.jsp">Descrizione</a>
+                <a href="cliente.jsp">Cliente</a>
+                <a href="venditore.jsp">Venditore</a>
             </div>
             
             <!-- Footer -->

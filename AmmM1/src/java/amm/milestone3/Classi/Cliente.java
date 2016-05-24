@@ -14,7 +14,7 @@ public class Cliente extends Utente {
     /* Attributi */
     private SaldoConto saldo = new SaldoConto();
     /* Attributi */
-    private ArrayList<Prodotto> prodottiAcquistabili = new ArrayList<Prodotto>();
+    protected ArrayList<Prodotto> prodottiAcquistabili = new ArrayList<Prodotto>();
    
     
     
@@ -42,8 +42,8 @@ public class Cliente extends Utente {
     /**
      * @return saldoConto
      */
-    public SaldoConto getSaldo() {
-        return saldo;
+    public double getSaldo() {
+        return saldo.getSaldo();
     }
 
     /**
@@ -51,5 +51,9 @@ public class Cliente extends Utente {
      */
     public void setSaldo(SaldoConto saldo) {
         this.saldo = saldo;
+    }
+    
+    public String getTipo(){
+        return "cliente";
     }
 }

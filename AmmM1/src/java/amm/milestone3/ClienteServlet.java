@@ -5,12 +5,10 @@
  */
 package amm.milestone3;
 
-import amm.milestone3.Classi.Factory;
-import amm.milestone3.Classi.Cliente;
-import amm.milestone3.Classi.Utente;
-import amm.milestone3.Classi.Factory;
+import amm.milestone3.Classi.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,26 +21,10 @@ import javax.servlet.http.HttpSession;
 
 /**
  *
- * @author Alessandro
+ * @author Robi
  */
-@WebServlet(name = "Login", urlPatterns = {"/Login"}, loadOnStartup = 0)
-public class Login extends HttpServlet {
-    
-    //Costanti
-    private static final String JDBC_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
-    private static final String DB_CLEAN_PATH = "../../web/WEB-INF/db/ammdb";
-    private static final String DB_BUILD_PATH = "WEB-INF/db/ammdb";
-
-    @Override 
-    public void init(){
-        String dbConnection = "jdbc:derby://localhost:1527/ammdb;create=true";
-        try {
-            Class.forName(JDBC_DRIVER);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        Factory.getInstance().setConnectionString(dbConnection);
-    }
+@WebServlet(name = "ClienteServlet", urlPatterns = {"/ClienteServlet"})
+public class ClienteServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -54,48 +36,53 @@ public class Login extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+            throws ServletException, IOException, SQLException {
+        HttpSession session = request.getSession();
         
-        HttpSession session = request.getSession(true);
-        PrintWriter out=response.getWriter();
+        //PrintWriter out = response.getWriter();
+        //out.println("A");
         
-        if(request.getParameter("Submit") != null)
-        {
-            // Preleva i dati inviati
-            String username = request.getParameter("Username");
-            String password = request.getParameter("Password");
-            
-            Utente u = Factory.getInstance().getUtente(username, password);
-            if(u != null)
+        Cliente x = null;
+        ArrayList<Cliente> listaClienti = Factory.getInstance().getClienti();
+            for(Utente u : listaClienti)
             {
-                
+                if(u.getUsername().equals(request.getParameter("username")))
+                { 
                     session.setAttribute("loggedIn", true);                    
                     session.setAttribute("idUtente", u.getId());
                                         
                     if(u instanceof Cliente) 
                     { 
                         request.setAttribute("cliente", u);
-                        session.setAttribute("tipoUtente", "cliente");
-                        request.getRequestDispatcher("M3/cliente.jsp").forward(request, response);
+                        x=(Cliente) u;
                     }
-                    else
-                    { 
-                        request.setAttribute("venditore", u);
-                        session.setAttribute("tipoUtente", "venditore");
-                        request.setAttribute("venditori", Factory.getInstance().getVenditori());
-                        request.getRequestDispatcher("M3/venditore.jsp").forward(request, response);  
-                    }
-            }  
-            else{
-                out.println("Utente nullo");
+                }                    
+            }
+        //controllo se c'è un id dell'articolo
+        if (request.getParameter("codProdotto") != null) {
+            
+            Integer codProdotto = Integer.parseInt(request.getParameter("codProdotto"));
+            Prodotto a = Factory.getInstance().getProdotto(codProdotto);
+            request.setAttribute("prodotto", a);
+            request.setAttribute("riepilogo", true); //variabile d'accesso alla pagina
+            //controllo se è stato premuto il pulsante conferma
+            if (request.getParameter("Conferma") != null) {
+                //controllo se il saldo è sufficiente
+                if(x.getSaldo() >= a.getPrezzo()){
+                    Factory.getInstance().buy(a.getCod(), x.getId());
+                    request.setAttribute("conferma", true); //variabile d'accesso alla pagina
+                    request.setAttribute("riepilogo", false); //variabile d'accesso alla pagina
+                    request.setAttribute("saldoInsuff", false); //variabile d'accesso alla pagina
+    
+                }else{
+                    request.setAttribute("saldoInsuff", true); //variabile d'accesso alla pagina
+                }
             }
         }
             
-        
-        //request.getRequestDispatcher("login.jsp").forward(request, response);
- 
+        request.getRequestDispatcher("M3/cliente.jsp").forward(request, response);
     }
+      
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -109,7 +96,11 @@ public class Login extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(ClienteServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -123,7 +114,11 @@ public class Login extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(ClienteServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -137,6 +132,3 @@ public class Login extends HttpServlet {
     }// </editor-fold>
 
 }
-    
-
-    

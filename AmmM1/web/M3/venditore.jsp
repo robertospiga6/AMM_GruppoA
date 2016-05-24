@@ -3,7 +3,7 @@
     Created on : 12-mag-2016, 17.35.59
     Author     : Robi
 --%>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <!--
@@ -11,10 +11,6 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
-
-<c:if test="${prodotto.cod%2 != 0}">
-                            <tr class="disp">
-
 
 <html>
     <head>
@@ -24,61 +20,98 @@ and open the template in the editor.
         <meta name="keywords" content="HTML, AMAZON, e-commerce, venditore">
         <meta name="description" content="Milestone1">
         <meta name="author" content="Roberto Spiga">
-        <link href="style.css" rel="stylesheet" type="text/css" media="screen" />
+        <link href="M3/style.css" rel="stylesheet" type="text/css" media="screen" />
+        <base href="http://localhost:8080/AmmM1">
     </head>
     <body id="venditore">
-        <c:if test="${venditore != null}">
-                         
-            <!-- Container -->
-            <div class="container">
+            <c:choose>
+                <c:when test="${venditore!=null}">
+                    
+                <!-- Container -->
+                <div class="container">
 
-                <!-- Header -->
-                <div class="header">
-                    Benvenuto ${venditore.username}
-                    <h1>Aggiungi Prodotti</h1>
-                </div>
-
-                <!-- Content -->
-                <div class="content">
-                    <div class="labels">
-                        <label for="nome" class="labelsform">Nome oggetto</label> 
-                        <label for="file" class="labelsform">Immagine Prodotto </label>
-                        <label for="tAdescrizione" class="labelsform">Descrizione Oggetto</label>
-                        <label for="prezzo" class="labelsform2">Prezzo Oggetto</label> 
-                        <label for="disponibili" class="labelsform">Quantit&agrave; Disponibile</label>
+                    <!-- Header -->
+                    <div class="header">
+                        Benvenuto ${venditore.username}
+                        <c:if test="${scelta==1}">
+                        <h1>Aggiungi Prodotto</h1>
+                        </c:if>
+                        <c:if test="${scelta==1}">
+                        <h1>Modifica Prodotto</h1>
+                        </c:if>
+                        <c:if test="${scelta==1}">
+                        <h1>Elimina Prodotto</h1>
+                        </c:if>
                     </div>
-                    <div class="inputs">
-                        <form method="POST"> 
-                            <input type="text" name="nome" id="nome" class="notButton">
-                            <input type="file" name="file" id="file" class="notButton"/>
-                            <textarea name="descrizione" id="tAdescrizione" cols="40" rows="10" class="notButton">Descrizione Oggetto</textarea>
-                            <input type="number" name="prezzo" id="prezzo" class="notButton">
-                            <input type="number" name="disponibili" id="disponibili" class="notButton">
-                            <input type="submit" value="Invia"/> 
+                    <c:if test="${scelta == null}">
+                    <div class="content">
+                        <form method="POST" action="http://localhost:8080/AmmM1/VenditoreServlet"> 
+                            <label for="scelta" class="labelsform">Scegli operazione</label>
+                                 <select name="scelta" size="3">
+                                    <option value="1">Aggiungi Prodotto</option>
+                                    <option value="2">Modifica Prodotto</option>
+                                    <option value="3">Elimina Prodotto</option>
+                                 </select>
+                            <input type="submit" name="SubmitScelta" value="Invia"/> 
                             <input type="reset" value="Reimposta"/> 
                         </form>
+                    </div>    
+                    </c:if>
+                    <c:if test="${scelta != null}">
+                        <!-- Content -->
+                        <div class="content">
+                            <c:if test="${scelta==1}">
+                                <jsp:include page="formProdotto.jsp"/>
+                            </c:if>
+                            <c:if test="${scelta==2}">
+                                <!--scelta id-->
+                                     <select name="lista" size="3">
+                                     <option value="val1">1</option>
+                                     <option value="val2">2</option>
+                                     <option value="val3">3</option>
+                                     <option value="val4">4</option>
+                                     <option value="val4">5</option>
+                                     </select>
+                                <jsp:include page="formProdotto.jsp"/>
+                            </c:if>
+                            <c:if test="${scelta==3}">
+                                <form method="POST" action="VenditoreServlet"> 
+                                    <label for="sceltaElimina" class="labelsform">Scegli operazione</label>
+                                        <select name="sceltaElimina" size="3">
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>                                        
+                                            <option value="5">5</option>
+                                        </select>
+                                <input type="submit" name="SubmitElimina" value="Invia"/> 
+                                <input type="reset" value="Reimposta"/> 
+                            </form>
+                            </c:if>
+                        </div>
+                    </c:if>
+                    <!-- Sidebar -->
+                    <div class="sidebar">
+                        <a href="descrizione.jsp">Descrizione</a>
+                        <a href="../login.jsp">Login</a>
                     </div>
-                </div>
 
-                <!-- Sidebar -->
-                <div class="sidebar">
-                    <a href="descrizione.html">Descrizione</a>
-                    <a href="login.html">Login</a>
-                </div>
+                    <!-- Footer -->
+                    <!--
+                    <div class="footer">
+                        Footer
+                    </div>
+                    -->
 
-                <!-- Footer -->
-                <!--
-                <div class="footer">
-                    Footer
                 </div>
-                -->
+            </c:when>
 
-            </div>
-        </c:if>
-        
-        <c:if test="${venditore == null}">
-        Errore nel caricamento della pagina, torna indietro. 
-        </c:if>
+            <c:otherwise>
+                <div>
+                    <h2>Errore nel caricamento della pagina, torna indietro. </h2>
+                </div>
+            </c:otherwise>
+        </c:choose>            
     </body>
 </html>
 

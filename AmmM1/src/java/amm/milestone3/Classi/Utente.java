@@ -11,7 +11,7 @@ package amm.milestone3.Classi;
  */
 public abstract class Utente {
     /* Attributi */
-    protected int id;
+    protected Integer id;
     protected String nome;
     protected String cognome;
     protected String username;
@@ -31,7 +31,7 @@ public abstract class Utente {
     /**
      * @return the id
      */
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

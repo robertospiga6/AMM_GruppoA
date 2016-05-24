@@ -33,4 +33,8 @@ public class SaldoConto {
     public void setSaldo(double saldo) {
         this.saldo = saldo;
     }
+
+    public boolean isSufficiente(double prezzo) {
+        return prezzo <= this.saldo;
+    }
 }

@@ -13,7 +13,9 @@ import java.util.ArrayList;
  */
 public class Venditore extends Utente {
     /* Attributi */
-    private ArrayList<Prodotto> prodottiInVendita = new ArrayList<Prodotto>();
+    private SaldoConto saldo = new SaldoConto();
+    /* Attributi */
+    protected ArrayList<Prodotto> prodottiInVendita = new ArrayList<Prodotto>();
     /* Costruttore */
     public Venditore(){
         super();
@@ -32,6 +34,24 @@ public class Venditore extends Utente {
      */
     public void setProdottiInVendita(ArrayList<Prodotto> prodottiInVendita) {
         this.prodottiInVendita = prodottiInVendita;
+    }
+    
+    /**
+     * @return saldoConto
+     */
+    public double getSaldo() {
+        return saldo.getSaldo();
+    }
+
+    /**
+     * @param saldo the saldo to set
+     */
+    public void setSaldo(SaldoConto saldo) {
+        this.saldo = saldo;
+    }
+    
+    public String getTipo(){
+        return "venditore";
     }
     
     

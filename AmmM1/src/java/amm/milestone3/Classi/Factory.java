@@ -5,6 +5,12 @@
  */
 package amm.milestone3.Classi;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 /**
@@ -15,130 +21,658 @@ import java.util.ArrayList;
 /* Costruttore */
 public class Factory {
     
-     // Attributi
+    // Attributi
+    String connectionString = "";
+    
+        // Singleton
     private static Factory singleton;
+        
     public static Factory getInstance() {
         if (singleton == null) {
             singleton = new Factory();
         }
         return singleton;
     }
-    
-    String connectionString = new String("");
-    
-        // Lista Prodotto
-        private ArrayList<Prodotto> listaProdotti = new ArrayList<Prodotto>();
-        // Lista Clienti
-        private ArrayList<Utente> listaClienti = new ArrayList<Utente>();
-        // Lista Venditori
-        private ArrayList<Utente> listaVenditori = new ArrayList<Utente>();
-    
+        
     private Factory(){
-        
-    // Prodotti         
-        Prodotto prodotto1 = new Prodotto();
-        prodotto1.setCod(1);
-        prodotto1.setNome("Nexus4");
-        prodotto1.setTipologia("Smartphone");
-        prodotto1.setPezzi(12);
-        prodotto1.setPrezzo(200.00);
-        prodotto1.setImgurl("img/nexus4.png");
-        listaProdotti.add(prodotto1);
-        
-        Prodotto prodotto2 = new Prodotto();
-        prodotto2.setCod(2);
-        prodotto2.setNome("Nexus5");
-        prodotto2.setTipologia("Smartphone");
-        prodotto2.setPezzi(93);
-        prodotto2.setPrezzo(250.00);
-        prodotto2.setImgurl("img/nexus5.png");
-        listaProdotti.add(prodotto2);
-        
-        Prodotto prodotto3 = new Prodotto();
-        prodotto3.setCod(3);
-        prodotto3.setNome("Nexus6");
-        prodotto3.setTipologia("Smartphone");
-        prodotto3.setPezzi(134);
-        prodotto3.setPrezzo(300.00);
-        prodotto3.setImgurl("img/nexus6.png");
-        listaProdotti.add(prodotto3);
-       
-        Prodotto prodotto4 = new Prodotto();
-        prodotto4.setCod(4);
-        prodotto4.setNome("Nexus5X");
-        prodotto4.setTipologia("Smartphone");
-        prodotto4.setPezzi(350);
-        prodotto4.setPrezzo(400.00);
-        prodotto4.setImgurl("img/nexus5x.png");
-        listaProdotti.add(prodotto4);
-        
-        Prodotto prodotto5 = new Prodotto();
-        prodotto5.setCod(5);
-        prodotto5.setNome("Nexus6P");
-        prodotto5.setTipologia("Smartphone");
-        prodotto5.setPezzi(450);
-        prodotto5.setPrezzo(500.00);
-        prodotto5.setImgurl("img/nexus6p.png");
-        listaProdotti.add(prodotto5);
-        
-    // Venditori
-        Venditore venditore1 = new Venditore();
-        venditore1.setId(1);
-        venditore1.setNome("Alessio");
-        venditore1.setCognome("Spiga");
-        venditore1.setUsername("alessiospiga");
-        venditore1.setPassword("1234");
-        ArrayList<Prodotto> arrayProdottiVenditore1 = new ArrayList<Prodotto>();
-        arrayProdottiVenditore1.add(prodotto1);
-        arrayProdottiVenditore1.add(prodotto2);
-        venditore1.setProdottiInVendita(arrayProdottiVenditore1);
-        listaVenditori.add(venditore1);
-        
-        Venditore venditore2 = new Venditore();
-        venditore2.setId(1);
-        venditore2.setNome("Paolo");
-        venditore2.setCognome("Corpino");
-        venditore2.setUsername("paolocorpino");
-        venditore2.setPassword("1234");
-        ArrayList<Prodotto> arrayProdottiVenditore2 = new ArrayList<Prodotto>();
-        arrayProdottiVenditore2.add(prodotto3);
-        arrayProdottiVenditore2.add(prodotto4);
-        venditore2.setProdottiInVendita(arrayProdottiVenditore2);
-        listaVenditori.add(venditore2);
-        
-    // Clienti
-        Cliente cliente1 = new Cliente();
-        cliente1.setId(1);
-        cliente1.setNome("Roberto");
-        cliente1.setCognome("Spiga");
-        cliente1.setUsername("robertospiga");
-        cliente1.setPassword("1234");
-        SaldoConto saldo1 = new SaldoConto();
-        saldo1.setSaldo(50);
-        cliente1.setSaldo(saldo1);
-        ArrayList<Prodotto> arrayProdottiCliente1 = new ArrayList<Prodotto>();
-        arrayProdottiCliente1.add(prodotto1);
-        arrayProdottiCliente1.add(prodotto2);
-        cliente1.setProdottiAcquistabili(arrayProdottiCliente1);
-        listaClienti.add(cliente1);
-        
-        Cliente cliente2 = new Cliente();
-        cliente2.setId(1);
-        cliente2.setNome("Nicola");
-        cliente2.setCognome("Bissiri");
-        cliente2.setUsername("nicolabissiri");
-        cliente2.setPassword("1234");
-        SaldoConto saldo2 = new SaldoConto();
-        saldo2.setSaldo(100);
-        cliente2.setSaldo(saldo2);
-        ArrayList<Prodotto> arrayProdottiCliente2 = new ArrayList<Prodotto>();
-        arrayProdottiCliente2.add(prodotto3);
-        arrayProdottiCliente2.add(prodotto5);
-        cliente2.setProdottiAcquistabili(arrayProdottiCliente2);
-        listaClienti.add(cliente2);
+     
     }
     
     /* Metodi */
+    
+    public Utente getUtente(String username, String password)
+    {
+        try
+        {
+            Connection conn = DriverManager.getConnection(connectionString, "robertospiga","0000");
+            // sql command
+            String query = "select * from utenti where username= ? and password= ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            // dati
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            //
+            ResultSet set = stmt.executeQuery();
+            
+            if(set.next())
+            {
+                if(set.getBoolean("tipo")){
+                    Venditore venditore = new Venditore();
+                    venditore.id = set.getInt("id");
+                    venditore.nome = set.getString("nome");
+                    venditore.cognome = set.getString("cognome");
+                    venditore.username = set.getString("username");
+                    venditore.password = set.getString("password");
+                    SaldoConto saldo = new SaldoConto();
+                    saldo.setSaldo(set.getDouble("saldo"));
+                    venditore.setSaldo(saldo);
+                    
+                    query = "select codprodotto from prodotti_utenti where idutente="+venditore.id;
+                    Statement st = conn.createStatement();
+                    ResultSet res2 = st.executeQuery(query);
+                    while(res2.next())
+                    {
+                        venditore.prodottiInVendita.add(getProdotto(res2.getInt("codprodotto")));
+                    }
+                    st.close();
+                    stmt.close();
+                    conn.close();
+                    return venditore;
+                }
+                else{
+                    Cliente cliente = new Cliente();
+                    cliente.id = set.getInt("id");
+                    cliente.nome = set.getString("nome");
+                    cliente.cognome = set.getString("cognome");
+                    cliente.username = set.getString("username");
+                    cliente.password = set.getString("password");
+                    SaldoConto saldo = new SaldoConto();
+                    saldo.setSaldo(set.getDouble("saldo"));
+                    cliente.setSaldo(saldo);
+                    
+                    query = "select codprodotto from prodotti_utenti where idutente="+cliente.id;
+                    Statement st = conn.createStatement();
+                    ResultSet res2 = st.executeQuery(query);
+                    while(res2.next())
+                    {
+                        cliente.prodottiAcquistabili.add(getProdotto(res2.getInt("codprodotto")));
+                    }
+                    st.close();
+                    stmt.close();
+                    conn.close();
+                    return cliente;
+                }
+            }
+                       
+            stmt.close();
+            conn.close();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+            
+    // Cliente
+    // Dato un id restituisce il relativo cliente (se esiste un profesclientesore con quell'id, altrimenti
+    // restituisce null).
+    public Cliente getCliente(int id)
+    {
+        try 
+        {
+            // path, username, password
+            Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");
+            // Query
+            String query = "select * from utenti "
+            + "where id = ? and tipo = false";
+            // Prepared Statement
+            PreparedStatement stmt = conn.prepareStatement(query);
+            // Si associano i valori
+            stmt.setInt(1, id);
+            // Esecuzione query
+            ResultSet res = stmt.executeQuery();
+            
+             // ciclo sulle righe restituite
+            if(res.next()) 
+            {
+                Cliente cliente = new Cliente();
+                cliente.id = res.getInt("id");
+                cliente.nome = res.getString("nome");
+                cliente.cognome = res.getString("cognome");
+                cliente.username = res.getString("username");
+                cliente.password = res.getString("password");
+                SaldoConto saldo = new SaldoConto();
+                saldo.setSaldo(res.getDouble("saldo"));
+                cliente.setSaldo(saldo);
+                   
+                query = "select codprodotto from prodotti_utenti where idutente="+cliente.id;
+                Statement st = conn.createStatement();
+                ResultSet res2 = st.executeQuery(query);
+                while(res2.next())
+                {
+                    cliente.prodottiAcquistabili.add(getProdotto(res2.getInt("codprodotto")));
+                }
+                st.close();
+                stmt.close();
+                conn.close();
+                return cliente;
+            }   
+            stmt.close();
+            conn.close();
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    // Restituisce la lista di tutti i clienti
+    public ArrayList<Cliente> getClienti()
+    {
+        ArrayList<Cliente> listaClienti = new ArrayList<Cliente>();
+        try 
+        {
+            // path, username, password
+            Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");
+            Statement stmt = conn.createStatement();
+            String query = "select * from utenti where tipo = false";
+            ResultSet res = stmt.executeQuery(query);
+            
+             // ciclo sulle righe restituite
+            while(res.next()) 
+            {
+                Cliente cliente = new Cliente();
+                cliente.id = res.getInt("id");
+                cliente.nome = res.getString("nome");
+                cliente.cognome = res.getString("cognome");
+                cliente.username = res.getString("username");
+                cliente.password = res.getString("password");
+                SaldoConto saldo = new SaldoConto();
+                saldo.setSaldo(res.getDouble("saldo"));
+                cliente.setSaldo(saldo);
+                   
+                query = "select codprodotto from prodotti_utenti where idutente="+cliente.id;
+                Statement st = conn.createStatement();
+                ResultSet res2 = st.executeQuery(query);
+                while(res2.next())
+                {
+                    cliente.prodottiAcquistabili.add(getProdotto(res2.getInt("codprodotto")));
+                }
+                listaClienti.add(cliente);
+            } 
+            
+            stmt.close();
+            conn.close();
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+        return listaClienti;
+    }
+    
+    
+    
+    // Venditori
+    // Restituisce la lista di tutti i venditori
+    public ArrayList<Venditore> getVenditori()
+    {
+        ArrayList<Venditore> listaVenditori = new ArrayList<Venditore>();
+        try 
+        {
+            // path, username, password
+            Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");
+            Statement stmt = conn.createStatement();
+            String query = "select * from utenti where tipo = true";
+            ResultSet set = stmt.executeQuery(query);
+            
+             // ciclo sulle righe restituite
+            while(set.next()) 
+            {
+                    Venditore venditore = new Venditore();
+                    venditore.id = set.getInt("id");
+                    venditore.nome = set.getString("nome");
+                    venditore.cognome = set.getString("cognome");
+                    venditore.username = set.getString("username");
+                    venditore.password = set.getString("password");
+                    SaldoConto saldo = new SaldoConto();
+                    saldo.setSaldo(set.getDouble("saldo"));
+                    venditore.setSaldo(saldo);
+                    
+                    query = "select codprodotto from prodotti_utenti where idutente="+venditore.id;
+                    Statement st = conn.createStatement();
+                    ResultSet res2 = st.executeQuery(query);
+                    while(res2.next())
+                    {
+                        venditore.prodottiInVendita.add(getProdotto(res2.getInt("codprodotto")));
+                    }
+                listaVenditori.add(venditore);
+            }     
+            
+            stmt.close();
+            conn.close();
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+        return listaVenditori;
+    }
+    
+    // Dato un id restituisce il relativo venditore (se esiste un venditore con quell'id, altrimenti
+    // restituisce null).
+    public Venditore getVenditore(int id)
+    {
+        try 
+        {
+            // path, username, password
+            Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");
+            String query = "select * from utenti "
+            + "where id = ? and tipo = true";
+            // Prepared Statement
+            PreparedStatement stmt = conn.prepareStatement(query);
+            // Si associano i valori
+            stmt.setInt(1, id);
+            // Esecuzione query
+            ResultSet set = stmt.executeQuery();
+           
+             // ciclo sulle righe restituite
+            if(set.next()) 
+            {
+                
+                    Venditore venditore = new Venditore();
+                    venditore.id = set.getInt("id");
+                    venditore.nome = set.getString("nome");
+                    venditore.cognome = set.getString("cognome");
+                    venditore.username = set.getString("username");
+                    venditore.password = set.getString("password");
+                    SaldoConto saldo = new SaldoConto();
+                    saldo.setSaldo(set.getDouble("saldo"));
+                    venditore.setSaldo(saldo);
+                    
+                    query = "select codprodotto from prodotti_utenti where idutente="+venditore.id;
+                    Statement st = conn.createStatement();
+                    ResultSet res2 = st.executeQuery(query);
+                    while(res2.next())
+                    {
+                        venditore.prodottiInVendita.add(getProdotto(res2.getInt("codprodotto")));
+                    }
+                    st.close();
+                    stmt.close();
+                    conn.close();
+                    return venditore;
+            }
+            
+            stmt.close();
+            conn.close();
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    
+    
+    
+    // Prodotti
+    // Restituisce la lista di tutti i prodotti
+    public ArrayList<Prodotto> getProdotti()
+    {
+        ArrayList<Prodotto> listaProdotti = new ArrayList<Prodotto>();
+        try 
+        {
+            // path, username, password
+            Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");
+            Statement stmt = conn.createStatement();
+            String query = "select * from prodotti";
+            ResultSet set = stmt.executeQuery(query);
+            
+             // ciclo sulle righe restituite
+            while(set.next()) 
+            {
+                Prodotto product = new Prodotto();
+                product.setCod(set.getInt("cod"));
+                product.setNome(set.getString("nome"));
+                product.setTipologia(set.getString("tipo"));
+                product.setPezzi(set.getInt("pezzi"));
+                product.setPrezzo(set.getDouble("prezzo"));
+                product.setImgurl(set.getString("imgurl"));
+                listaProdotti.add(product);
+            }
+            
+            stmt.close();
+            conn.close();
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+        return listaProdotti;
+    }
+    
+    // Dato un id restituisce il relativo prodotto
+    public Prodotto getProdotto(int cod)
+    {
+        try 
+        {
+            // path, username, password
+            Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");
+            String query = "select * from prodotti where cod = ? ";
+            // Prepared Statement
+            PreparedStatement stmt = conn.prepareStatement(query);
+            // Si associano i valori
+            stmt.setInt(1, cod);
+            // Esecuzione query
+            ResultSet res = stmt.executeQuery();
+            
+             // ciclo sulle righe restituite
+            if(res.next()) 
+            {
+                Prodotto product = new Prodotto();
+                product.setCod(res.getInt("cod"));
+                product.setNome(res.getString("nome"));
+                product.setTipologia(res.getString("tipo"));
+                product.setPezzi(res.getInt("pezzi"));
+                product.setPrezzo(res.getDouble("prezzo"));
+                product.setImgurl(res.getString("imgurl"));
+   
+                stmt.close();
+                conn.close();
+                return product;
+            } 
+            
+            stmt.close();
+            conn.close();
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+        
+    public void aggiungiProdotto(int idVenditore, String nome, String tipo, int pezzi, double prezzo, String imgurl) throws SQLException
+    {
+        // path, username, password
+        Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");   
+        
+        PreparedStatement updateProdottiUtenti = null;
+        PreparedStatement updateProdotti = null;
+        int cod=0;
+        // Sql 
+        String insertProdottiUtenti = "insert into prodotti_utenti "
+                + "(codprodotto, idutente) "
+                + "values (?,?)";
+        String insertProdotto = "insert into prodotti "
+                + "(nome, tipo, pezzi, prezzo, imgurl) "
+                + "values (?,?,?,?,?)";
+        
+        try
+        {
+           conn.setAutoCommit(false);
+           updateProdotti = conn.prepareStatement(insertProdotto);
+           updateProdottiUtenti = conn.prepareStatement(insertProdottiUtenti);
+           
+           // Prodotti
+           updateProdotti.setString(1, nome);
+           updateProdotti.setString(2, tipo);
+           updateProdotti.setInt(3, pezzi);
+           updateProdotti.setDouble(4, prezzo);
+           updateProdotti.setString(5, imgurl);
+           
+           int c2 = updateProdotti.executeUpdate();
+           if(c2 != 1) conn.rollback();
+           conn.commit();
+           
+           // Prodotti_Utenti
+           cod=getCodProdotto(nome, tipo, pezzi, prezzo, imgurl);
+           if(cod != 0){
+                
+                updateProdottiUtenti.setInt(1, cod);
+                updateProdottiUtenti.setInt(2, idVenditore);
+
+                int c1 = updateProdottiUtenti.executeUpdate();
+
+                if(c1 != 1)
+                    conn.rollback();
+
+                conn.commit(); 
+           }          
+        }catch(SQLException e)
+        {
+            try
+            {
+                conn.rollback();
+            }catch(SQLException e2)
+            {
+                
+            }
+        }
+        finally
+        {
+            if(updateProdottiUtenti != null)
+                updateProdottiUtenti.close();
+            if(updateProdotti != null)
+                updateProdotti.close();
+            
+            conn.setAutoCommit(true);
+            conn.close();
+        }    
+    }
+    
+    public void modificaProdotto(int codProdotto, String nome, String tipo, int pezzi, double prezzo, String imgurl) throws SQLException
+    {
+        // path, username, password
+        Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");   
+        
+        PreparedStatement updateProdotti = null;
+        // Sql 
+        String insertProdotto = "update prodotti set "
+                + "nome = ?, tipo = ?, pezzi = ?, prezzo = ?, imgurl = ? "
+                + "where cod = ?";
+        
+        try
+        {
+           conn.setAutoCommit(false);
+           updateProdotti = conn.prepareStatement(insertProdotto);           
+           // Prodotti
+           updateProdotti.setString(1, nome);
+           updateProdotti.setString(2, tipo);
+           updateProdotti.setInt(3, pezzi);
+           updateProdotti.setDouble(4, prezzo);
+           updateProdotti.setString(5, imgurl);
+           updateProdotti.setInt(6, codProdotto);
+           
+           int c2 = updateProdotti.executeUpdate();
+           if(c2 != 1) conn.rollback();
+           conn.commit();
+           
+           
+        }catch(SQLException e)
+        {
+            try
+            {
+                conn.rollback();
+            }catch(SQLException e2)
+            {
+                
+            }
+        }
+        finally
+        {
+            if(updateProdotti != null)
+                updateProdotti.close();
+            
+            conn.setAutoCommit(true);
+            conn.close();
+        }    
+    }
+    
+    public void eliminaProdotto(int codProdotto) throws SQLException
+    {
+        // path, username, password
+        Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");   
+        
+        PreparedStatement deleteProdotti = null;
+        // Sql 
+        String insertProdotto = "delete from prodotti "
+                + "where cod = ?";
+        
+        try
+        {
+           conn.setAutoCommit(false);
+           deleteProdotti = conn.prepareStatement(insertProdotto);           
+           // Prodotti
+           deleteProdotti.setInt(1, codProdotto);
+           
+           int c2 = deleteProdotti.executeUpdate();
+           if(c2 != 1) conn.rollback();
+           conn.commit();
+           
+           
+        }catch(SQLException e)
+        {
+            try
+            {
+                conn.rollback();
+            }catch(SQLException e2)
+            {
+                
+            }
+        }
+        finally
+        {
+            if(deleteProdotti != null)
+                deleteProdotti.close();
+            
+            conn.setAutoCommit(true);
+            conn.close();
+        }    
+    }
+    
+    public void buy(int codProdotto, int idCliente) throws SQLException
+    {
+        // path, username, password
+        Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");   
+        
+        PreparedStatement updateProdottiVenditore = null;
+        PreparedStatement updateSaldoCliente = null;
+        PreparedStatement updateSaldoVenditore = null;
+             
+        // Sql 
+        String deleteProdottoV = "delete from prodotti_utenti "
+                + "where codprodotto = ? and idutente = ?";
+        
+        String updateSaldoC = "update utenti set "
+                + "saldo = ? "
+                + "where id = ?";
+        
+        String updateSaldoV = "update utenti set "
+                + "saldo = ? "
+                + "where id = ?";
+        
+        try
+        {
+           conn.setAutoCommit(false);
+           
+           int idVenditore = getIdVenditoreFromProdotto(codProdotto);
+           Cliente cliente = getCliente(idCliente);
+           Venditore venditore = getVenditore(idVenditore);
+           Prodotto prodotto = getProdotto(codProdotto);
+           
+           updateProdottiVenditore = conn.prepareStatement(deleteProdottoV);
+           updateSaldoCliente = conn.prepareStatement(updateSaldoC);
+           updateSaldoVenditore = conn.prepareStatement(updateSaldoV);
+           
+           // ProdottiVenditore
+           updateProdottiVenditore.setInt(1, codProdotto);
+           updateProdottiVenditore.setInt(2, idVenditore);
+           // SaldoCliente
+           updateSaldoCliente.setDouble(1, cliente.getSaldo() - prodotto.getPrezzo() );
+           updateSaldoCliente.setInt(2, idCliente);
+           // SaldoVenditore
+           updateSaldoVenditore.setDouble(1, venditore.getSaldo() + prodotto.getPrezzo() );
+           updateSaldoVenditore.setInt(2, idVenditore);
+           
+           int c1 = updateProdottiVenditore.executeUpdate();
+           int c2 = updateSaldoCliente.executeUpdate();
+           int c3 = updateSaldoVenditore.executeUpdate();
+           
+           if(c1 != 1 || c2 != 1 || c3 != 1 || idVenditore == 0)
+               conn.rollback();
+           
+           conn.commit();           
+        }catch(SQLException e)
+        {
+            try
+            {
+                conn.rollback();
+            }catch(SQLException e2)
+            {
+                
+            }
+        }
+        finally
+        {
+            if(updateProdottiVenditore != null)
+                updateProdottiVenditore.close();
+            if(updateSaldoCliente != null)
+                updateSaldoCliente.close();
+            if(updateSaldoVenditore != null)
+                updateSaldoVenditore.close();
+            
+            conn.setAutoCommit(true);
+            conn.close();
+        }    
+    }
+    
+    public int getCodProdotto(String nome, String tipo, int pezzi, double prezzo, String imgurl) 
+    {
+        try 
+        {
+            // path, username, password
+            Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");
+            String query = "select prodotti.cod from prodotti "
+                    + "where nome = ? and tipo = ? and pezzi = ? "
+                    + "and prezzo = ? and imgurl = ?";
+            int counter=0;
+            // Prepared Statement
+            PreparedStatement stmt = conn.prepareStatement(query);
+            // Si associano i valori
+            stmt.setString(1, nome);
+            stmt.setString(2, tipo);
+            stmt.setInt(3, pezzi);            
+            stmt.setDouble(4, prezzo);
+            stmt.setString(5, imgurl);
+            
+            // Esecuzione query
+            ResultSet res = stmt.executeQuery();
+            
+            // ciclo sulle righe restituite
+            if(res.next() & counter == 0) 
+            {
+                int cod = res.getInt("cod");
+                stmt.close();
+                conn.close();
+                return cod;
+            } 
+            
+            stmt.close();
+            conn.close();
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    
     
     public void setConnectionString(String s){
 	this.connectionString = s;
@@ -146,42 +680,43 @@ public class Factory {
     public String getConnectionString(){
 	return this.connectionString;
     }
-    
-       
-    public ArrayList<Utente> getClienteList(){
-        return listaClienti;
-    }
-    
-    public Utente getCliente(int id){
-        for(Utente u : listaClienti)
+
+    private int getIdVenditoreFromProdotto(int codProdotto) 
+    {
+        try 
         {
-            if(u.id == id)
-                return u;
-        }
-        
-        return null;
-    }
-    
-    public ArrayList<Utente> getVenditoreList(){
-        return listaVenditori;
-    }
-    
-    public Utente getVenditore(int id){
-        for(Utente u : listaVenditori)
+            // path, username, password
+            Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");
+            String query = "SELECT prodotti_utenti.idutente " 
+                           + "FROM utenti " 
+                           + "JOIN prodotti_utenti ON prodotti_utenti.idutente = utenti.id " 
+                           + "WHERE utenti.tipo = true and codprodotto = ?;";
+            int counter=0;
+            // Prepared Statement
+            PreparedStatement stmt = conn.prepareStatement(query);
+            // Si associano i valori
+            stmt.setInt(1, codProdotto);
+            
+            // Esecuzione query
+            ResultSet res = stmt.executeQuery();
+            
+            // ciclo sulle righe restituite
+            if(res.next() & counter == 0) 
+            {
+                int id = res.getInt("idutente");
+                stmt.close();
+                conn.close();
+                return id;
+            } 
+            
+            stmt.close();
+            conn.close();
+        } 
+        catch (SQLException e) 
         {
-            if(u.id == id)
-                return u;
+            e.printStackTrace();
         }
-        
-        return null;
+        return 0;
     }
-    
-    public ArrayList<Utente> getUserList(){
-        ArrayList<Utente> listaUtenti = new ArrayList<Utente>();
-        
-        listaUtenti.addAll(listaClienti);
-        listaUtenti.addAll(listaVenditori);
-        
-        return listaUtenti;
-    }
+
 }

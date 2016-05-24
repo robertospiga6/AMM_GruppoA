@@ -11,10 +11,10 @@ package amm.milestone3.Classi;
  */
 public class Prodotto {
     /* Attributi */
-    private int cod;
+    private Integer cod;
     private String nome;
     private String tipologia;
-    private int pezzi;
+    private Integer pezzi;
     private double prezzo;
     private String imgurl;
     
@@ -33,7 +33,7 @@ public class Prodotto {
     /**
      * @return the cod
      */
-    public int getCod() {
+    public Integer getCod() {
         return cod;
     }
 
@@ -75,7 +75,7 @@ public class Prodotto {
     /**
      * @return the pezzi
      */
-    public int getPezzi() {
+    public Integer getPezzi() {
         return pezzi;
     }
 

@@ -19,7 +19,7 @@ and open the template in the editor.
         <meta name="keywords" content="HTML, AMAZON, e-commerce">
         <meta name="description" content="Milestone1">
         <meta name="author" content="Roberto Spiga">
-        <link href="style.css" rel="stylesheet" type="text/css" media="screen" />
+        <link href="M3/style.css" rel="stylesheet" type="text/css" media="screen" />
     </head>
     <body id="descrizione">
         <!-- Container -->
@@ -83,7 +83,7 @@ and open the template in the editor.
             
             <!-- Sidebar -->
             <div class="sidebar">
-                <a href="login.html">Login</a>
+                <a href="M3/login.jsp">Login</a>
             </div>
             
             <!-- Footer -->
