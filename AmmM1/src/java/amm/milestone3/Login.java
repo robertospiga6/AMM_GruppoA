@@ -58,7 +58,28 @@ public class Login extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         
         HttpSession session = request.getSession(true);
-        PrintWriter out=response.getWriter();
+        //PrintWriter out=response.getWriter();
+        //out.println("prima if");
+        
+        if(request.getParameter("LogOut") != null) {
+            session.invalidate();
+            request.getRequestDispatcher("M3/login.jsp").forward(request, response);
+        }
+        
+        
+        if((Boolean)session.getAttribute("loggedIn") != null){
+            if(session.getAttribute("tipoUtente").equals("venditore")){
+                Utente u = Factory.getInstance().getVenditore((int)session.getAttribute("idUtente"));
+                request.setAttribute("venditore", u);
+                request.getRequestDispatcher("M3/venditore.jsp").forward(request, response);  
+            }
+            else if(session.getAttribute("tipoUtente").equals("cliente")){
+                Utente u = Factory.getInstance().getCliente((int)session.getAttribute("idUtente"));
+                request.setAttribute("cliente", u);
+                request.getRequestDispatcher("M3/cliente.jsp").forward(request, response);  
+            }
+        }
+        
         
         if(request.getParameter("Submit") != null)
         {
@@ -69,7 +90,7 @@ public class Login extends HttpServlet {
             Utente u = Factory.getInstance().getUtente(username, password);
             if(u != null)
             {
-                
+                    
                     session.setAttribute("loggedIn", true);                    
                     session.setAttribute("idUtente", u.getId());
                                         
@@ -83,17 +104,22 @@ public class Login extends HttpServlet {
                     { 
                         request.setAttribute("venditore", u);
                         session.setAttribute("tipoUtente", "venditore");
-                        request.setAttribute("venditori", Factory.getInstance().getVenditori());
                         request.getRequestDispatcher("M3/venditore.jsp").forward(request, response);  
                     }
             }  
             else{
-                out.println("Utente nullo");
+                request.setAttribute("logInError", true);
+                request.getRequestDispatcher("M3/login.jsp").forward(request, response);
             }
+            
+        }
+        else{
+            request.setAttribute("logInError", null);
+            request.getRequestDispatcher("M3/login.jsp").forward(request, response);
         }
             
         
-        //request.getRequestDispatcher("login.jsp").forward(request, response);
+        
  
     }
 

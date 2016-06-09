@@ -4,6 +4,7 @@
     Author     : Robi
 --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <!--
@@ -19,7 +20,7 @@ and open the template in the editor.
         <meta name="keywords" content="HTML, AMAZON, e-commerce, login">
         <meta name="description" content="Milestone1">
         <meta name="author" content="Roberto Spiga">
-        <link href="style.css" rel="stylesheet" type="text/css" media="screen" />
+        <link href="M3/style.css" rel="stylesheet" type="text/css" media="screen" />
     </head>
     <body id="login">
         <!-- Container -->
@@ -32,24 +33,33 @@ and open the template in the editor.
             
             <!-- Content -->
             <div class="content">
-                <div class="labels">
-                    <label for="username">Username</label>
-                    <label for="password">Password</label>
-                </div>
-                <div class="inputs">
-                    <form method="POST" action="../Login"> 
-                        <input class="notButton" type="text" name="Username" id="username">
-                        <input type="password" name="Password" id="password">
-                        <input type="Submit" name="Submit" value="Accedi"/>
-                    </form>
-                </div>
+                <c:choose>
+                    <c:when test="${logInError!=null}">
+                        <div>
+                            <h2>Errore nel login torna indietro. </h2>
+                        </div>
+                    </c:when> 
+                    <c:otherwise>
+                        <div class="labels">
+                            <label for="username">Username</label>
+                            <label for="password">Password</label>
+                        </div>
+                        <div class="inputs">
+                            <form method="POST" action="login.html"> 
+                                <input class="notButton" type="text" name="Username" id="username">
+                                <input type="password" name="Password" id="password">
+                                <input type="Submit" name="Submit" value="Accedi"/>
+                            </form>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </div>
             
             <!-- Sidebar -->
             <div class="sidebar">
-                <a href="descrizione.jsp">Descrizione</a>
-                <a href="cliente.jsp">Cliente</a>
-                <a href="venditore.jsp">Venditore</a>
+                <a href="descrizione.html">Descrizione</a>
+                <a href="cliente.html">Cliente</a>
+                <a href="venditore.html">Venditore</a>
             </div>
             
             <!-- Footer -->

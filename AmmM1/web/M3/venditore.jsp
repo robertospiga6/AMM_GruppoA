@@ -21,7 +21,7 @@ and open the template in the editor.
         <meta name="description" content="Milestone1">
         <meta name="author" content="Roberto Spiga">
         <link href="M3/style.css" rel="stylesheet" type="text/css" media="screen" />
-        <base href="http://localhost:8080/AmmM1">
+        
     </head>
     <body id="venditore">
             <c:choose>
@@ -33,19 +33,22 @@ and open the template in the editor.
                     <!-- Header -->
                     <div class="header">
                         Benvenuto ${venditore.username}
+                        <form method="post" action="login.html">
+                            <button type="submit" name="LogOut">Esci</button>
+                        </form> 
                         <c:if test="${scelta==1}">
                         <h1>Aggiungi Prodotto</h1>
                         </c:if>
-                        <c:if test="${scelta==1}">
+                        <c:if test="${scelta==2}">
                         <h1>Modifica Prodotto</h1>
                         </c:if>
-                        <c:if test="${scelta==1}">
+                        <c:if test="${scelta==3}">
                         <h1>Elimina Prodotto</h1>
                         </c:if>
                     </div>
                     <c:if test="${scelta == null}">
                     <div class="content">
-                        <form method="POST" action="http://localhost:8080/AmmM1/VenditoreServlet"> 
+                        <form method="POST" action="venditore.html?id=${venditore.id}"> 
                             <label for="scelta" class="labelsform">Scegli operazione</label>
                                  <select name="scelta" size="3">
                                     <option value="1">Aggiungi Prodotto</option>
@@ -55,61 +58,69 @@ and open the template in the editor.
                             <input type="submit" name="SubmitScelta" value="Invia"/> 
                             <input type="reset" value="Reimposta"/> 
                         </form>
+                        
                     </div>    
                     </c:if>
                     <c:if test="${scelta != null}">
                         <!-- Content -->
                         <div class="content">
                             <c:if test="${scelta==1}">
-                                <jsp:include page="formProdotto.jsp"/>
+                                <div class="labels">
+                                    <jsp:include page='labelsV.jsp'/>
+                                </div>
+                                <div class="inputs">
+                                <form method="POST" action="venditore.html?id=${venditore.id}"> 
+                                    
+                                    <jsp:include page='inputsV.jsp'/>
+                                    <input type="submit" name="SubmitAggiungi" value="Invia"/> 
+                                    <input type="reset" value="Reimposta"/> 
+                                </form>
+                                </div>
                             </c:if>
                             <c:if test="${scelta==2}">
-                                <!--scelta id-->
-                                     <select name="lista" size="3">
-                                     <option value="val1">1</option>
-                                     <option value="val2">2</option>
-                                     <option value="val3">3</option>
-                                     <option value="val4">4</option>
-                                     <option value="val4">5</option>
-                                     </select>
-                                <jsp:include page="formProdotto.jsp"/>
+                                <div class="labels">
+                                    <label for="oggetto" class="labelsform">Seleziona oggetto</label> 
+                                    <jsp:include page='labelsV.jsp'/>
+                                </div>
+                                <div class="inputs">
+                                    <form method="POST" action="venditore.html?id=${venditore.id}">
+                                        <select class="notButton" name="Cod">
+                                            <c:forEach var="prodotto" items="${venditore.prodottiInVendita}">
+                                                <option value="${prodotto.cod}">${prodotto.nome}</option>
+                                            </c:forEach>
+                                        </select>
+                                        <jsp:include page='inputsV.jsp'/>
+                                        <input type="submit" name="SubmitModifica" value="Invia"/> 
+                                        <input type="reset" value="Reimposta"/> 
+                                    </form>
+                                </div>
                             </c:if>
                             <c:if test="${scelta==3}">
-                                <form method="POST" action="VenditoreServlet"> 
-                                    <label for="sceltaElimina" class="labelsform">Scegli operazione</label>
-                                        <select name="sceltaElimina" size="3">
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>                                        
-                                            <option value="5">5</option>
+                                <form method="POST" action="venditore.html?id=${venditore.id}"> 
+                                    <p>
+                                    <label for="sceltaElimina" class="labelsform">Che prodotto vuoi eliminare?</label>
+                                    
+                                        <select name="Cod">
+                                            <c:forEach var="prodotto" items="${venditore.prodottiInVendita}">
+                                                <option value="${prodotto.cod}">${prodotto.nome}</option>
+                                            </c:forEach>
                                         </select>
-                                <input type="submit" name="SubmitElimina" value="Invia"/> 
-                                <input type="reset" value="Reimposta"/> 
-                            </form>
+                                    <input type="submit" name="SubmitElimina" value="Invia"/> 
+                                    <input type="reset" value="Reimposta"/> 
+                                    </p>
+                                </form>
                             </c:if>
                         </div>
                     </c:if>
                     <!-- Sidebar -->
-                    <div class="sidebar">
-                        <a href="descrizione.jsp">Descrizione</a>
-                        <a href="../login.jsp">Login</a>
-                    </div>
-
-                    <!-- Footer -->
-                    <!--
-                    <div class="footer">
-                        Footer
-                    </div>
-                    -->
-
+                    <jsp:include page="sidebarV.jsp" />
                 </div>
             </c:when>
 
             <c:otherwise>
-                <div>
-                    <h2>Errore nel caricamento della pagina, torna indietro. </h2>
-                </div>
+                    <h2>Errore accesso negato, torna indietro. </h2>
+                
+                <a href="login.html">Login</a>
             </c:otherwise>
         </c:choose>            
     </body>

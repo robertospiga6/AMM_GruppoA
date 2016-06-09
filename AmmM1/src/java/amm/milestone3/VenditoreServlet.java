@@ -39,33 +39,49 @@ public class VenditoreServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
-       PrintWriter out = response.getWriter();
-        out.println("A");/*
+        PrintWriter out = response.getWriter();
+        //out.println("A");
         HttpSession session = request.getSession();
         
+        Venditore v = null;
+        
+        if(session.getAttribute("loggedIn") != null){
+            ArrayList<Venditore> listaVenditori = Factory.getInstance().getVenditori();
+                for(Utente u : listaVenditori)
+                {
+                    if(u.getId() == Integer.parseInt(request.getParameter("id")))
+                    { 
+                        session.setAttribute("loggedIn", true);                    
+                        session.setAttribute("idUtente", u.getId());
+
+                        if(u instanceof Venditore) 
+                        { 
+                            request.setAttribute("venditore", u);
+                            v=(Venditore) u;
+                        }
+                    }                    
+                }
+        }
         //memorizzazione dati del form
+        
             //SCELTA OPERAZIONE
             if (request.getParameter("SubmitScelta") != null) {
                 String scelta=request.getParameter("scelta");
-                Venditore v = (Venditore)session.getAttribute("venditore");
                 request.setAttribute("scelta", scelta);
                 request.getRequestDispatcher("M3/venditore.jsp").forward(request, response);
             }
+            
             //AGGIUNGI
-            if (request.getParameter("SubmitForm") != null) {
-                Venditore v = (Venditore)session.getAttribute("venditore");
+            if (request.getParameter("SubmitAggiungi") != null) {
                 Factory.getInstance().aggiungiProdotto(v.getId(),request.getParameter("Nome"),
                         request.getParameter("Tipologia"),
                         Integer.parseInt(request.getParameter("Pezzi")),
                         Double.parseDouble(request.getParameter("Prezzo")),
                         request.getParameter("ImgUrl"));
             }
-            else {
-                request.setAttribute("formArticolo", false);
-            }
             
             //MODIFICA
-            if (request.getParameter("SubmitMod") != null) {
+            if (request.getParameter("SubmitModifica") != null) {
                     Factory.getInstance().modificaProdotto(Integer.parseInt(request.getParameter("Cod")),
                             request.getParameter("Nome"),
                             request.getParameter("Tipologia"),
@@ -73,30 +89,26 @@ public class VenditoreServlet extends HttpServlet {
                             Double.parseDouble(request.getParameter("Prezzo")),
                             request.getParameter("ImgUrl"));
                 }
-            else {
-                request.setAttribute("formArticolo", false);
-            }
             
             //ELIMINA
             if (request.getParameter("SubmitElimina") != null) {
-                    Factory.getInstance().eliminaProdotto(Integer.parseInt(request.getParameter("sceltaElimina")));
+                    Factory.getInstance().eliminaProdotto(request.getParameter("Cod"), v.getId());
             }
             
-            if(request.getParameter("SubmitMod") != null || request.getParameter("SubmitForm") != null){
-                request.setAttribute("articolo", Factory.getInstance().getProdotto(Factory.getInstance().getCodProdotto(
-                        request.getParameter("Nome"),
-                        request.getParameter("Tipologia"),
-                        Integer.parseInt(request.getParameter("Pezzi")),
-                        Double.parseDouble(request.getParameter("Prezzo")),
-                        request.getParameter("ImgUrl"))));
-
-                request.setAttribute("formArticolo", true);
-                request.getRequestDispatcher("M3/prodottoAggiunto.jsp").forward(request, response);
+            if(request.getParameter("SubmitModifica") != null || request.getParameter("SubmitAggiungi") != null){
+                
+                request.setAttribute("prodotto", Factory.getInstance().getProdotto(Factory.getInstance().getCodProdotto(
+                request.getParameter("Nome"),
+                request.getParameter("Tipologia"),
+                Integer.parseInt(request.getParameter("Pezzi")),
+                Double.parseDouble(request.getParameter("Prezzo")),
+                request.getParameter("ImgUrl"))));
+                request.getRequestDispatcher("M3/prodotto.jsp").forward(request, response);
             }
         
         //richiamo la pagina venditore
         request.getRequestDispatcher("M3/venditore.jsp").forward(request, response);
-        */
+        
     }
     /*
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

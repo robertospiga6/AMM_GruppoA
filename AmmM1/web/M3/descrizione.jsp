@@ -20,6 +20,7 @@ and open the template in the editor.
         <meta name="description" content="Milestone1">
         <meta name="author" content="Roberto Spiga">
         <link href="M3/style.css" rel="stylesheet" type="text/css" media="screen" />
+        <base href="http://localhost:8080/AmmM1/">
     </head>
     <body id="descrizione">
         <!-- Container -->
@@ -27,11 +28,12 @@ and open the template in the editor.
             
             <!-- Header -->
             <div class="header">
-                <c:if test="${venditore.username == ""}">
-                Benvenuto ${cliente.username}
+                Benvenuto
+                <c:if test="${cliente != null}">
+                 ${cliente.username}
                 </c:if>
-                <c:if test="${cliente.username == ""}">
-                Benvenuto ${venditore.username}  
+                <c:if test="${venditore != null}">
+                 ${venditore.username}  
                 </c:if>
                 <h1>AMAZON</h1>
             </div>
@@ -83,16 +85,9 @@ and open the template in the editor.
             
             <!-- Sidebar -->
             <div class="sidebar">
-                <a href="M3/login.jsp">Login</a>
+                <a href="login.html">Login</a>
             </div>
-            
-            <!-- Footer -->
-            <!--
-            <div class="footer">
-                Footer
-            </div>
-            -->
-            
+                        
         </div>    
     </body>
 </html>

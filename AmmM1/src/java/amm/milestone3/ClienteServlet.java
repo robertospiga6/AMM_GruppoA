@@ -39,26 +39,31 @@ public class ClienteServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         HttpSession session = request.getSession();
-        
-        //PrintWriter out = response.getWriter();
-        //out.println("A");
-        
         Cliente x = null;
-        ArrayList<Cliente> listaClienti = Factory.getInstance().getClienti();
-            for(Utente u : listaClienti)
-            {
-                if(u.getUsername().equals(request.getParameter("username")))
-                { 
-                    session.setAttribute("loggedIn", true);                    
-                    session.setAttribute("idUtente", u.getId());
-                                        
-                    if(u instanceof Cliente) 
+        PrintWriter out = response.getWriter();
+        //out.println("A");
+        if(session.getAttribute("loggedIn") != null){
+        
+            ArrayList<Cliente> listaClienti = Factory.getInstance().getClienti();
+                for(Utente u : listaClienti)
+                {
+                    if(u.getId() == Integer.parseInt(request.getParameter("id")))
                     { 
-                        request.setAttribute("cliente", u);
-                        x=(Cliente) u;
-                    }
-                }                    
-            }
+                        session.setAttribute("loggedIn", true);                    
+                        session.setAttribute("idUtente", u.getId());
+
+                        if(u instanceof Cliente) 
+                        { 
+                            request.setAttribute("cliente", u);
+                            x=(Cliente) u;
+                        }
+                    }                    
+                }
+        }
+        if(request.getParameter("ricaricaC") != null) {
+            Factory.getInstance().setSaldoUtente(x.getId(), (String) request.getParameter("Ricarica"), 1); 
+            request.setAttribute("ricaricaFatta", true);
+        }
         //controllo se c'è un id dell'articolo
         if (request.getParameter("codProdotto") != null) {
             
@@ -70,10 +75,11 @@ public class ClienteServlet extends HttpServlet {
             if (request.getParameter("Conferma") != null) {
                 //controllo se il saldo è sufficiente
                 if(x.getSaldo() >= a.getPrezzo()){
-                    Factory.getInstance().buy(a.getCod(), x.getId());
+                    Factory.getInstance().buy(a.getCod(), x.getId(), request.getParameter("NumeroPezzi"));
                     request.setAttribute("conferma", true); //variabile d'accesso alla pagina
                     request.setAttribute("riepilogo", false); //variabile d'accesso alla pagina
                     request.setAttribute("saldoInsuff", false); //variabile d'accesso alla pagina
+                    request.setAttribute("cliente", x);
     
                 }else{
                     request.setAttribute("saldoInsuff", true); //variabile d'accesso alla pagina

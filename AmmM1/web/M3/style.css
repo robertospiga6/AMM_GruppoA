@@ -68,6 +68,19 @@ body[id="venditore"] label::after{
     content: '\A';
     white-space: pre;
 }
+form[class="conferma"]::after{
+    display:block;
+    content: '\A\A\A\A\A\A';
+    white-space: pre;
+}
+body[id="prodotto"] p::after{
+    display:block;
+    content: '\A';
+    white-space: pre;
+}
+body[id="prodotto"] #resoconto{
+    margin: 10px 10px 10px 10px;
+}
 body[id="venditore"] .labelsform2::before{
     display:block;
     content: '\A';
@@ -78,6 +91,12 @@ input {
     background-color: lightgray;
     border-style: none;
     margin-left: 10px;
+}
+select.notButton {
+        margin-left: 8px;
+}
+select{
+    margin-bottom: 5px;
 }
 .notButton{
     display:block;
@@ -95,7 +114,7 @@ input:focus {
 #password {
         float: left;
     }
-input[type="reset"], input[type="submit"] {
+input[type="reset"], input[type="submit"] ,button{
     width: 80px;
     font-style: italic;
     font-weight: bold;
@@ -210,6 +229,7 @@ tr.pari {
         margin-top: 25px;
         margin-left: 25%;
     }
+    
 /*TABELLA*/
     #tabella {
         font-size: 14px;

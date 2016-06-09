@@ -89,15 +89,7 @@ public class Factory {
                     SaldoConto saldo = new SaldoConto();
                     saldo.setSaldo(set.getDouble("saldo"));
                     cliente.setSaldo(saldo);
-                    
-                    query = "select codprodotto from prodotti_utenti where idutente="+cliente.id;
-                    Statement st = conn.createStatement();
-                    ResultSet res2 = st.executeQuery(query);
-                    while(res2.next())
-                    {
-                        cliente.prodottiAcquistabili.add(getProdotto(res2.getInt("codprodotto")));
-                    }
-                    st.close();
+                    cliente.setProdottiAcquistabili(getProdotti());
                     stmt.close();
                     conn.close();
                     return cliente;
@@ -145,15 +137,7 @@ public class Factory {
                 SaldoConto saldo = new SaldoConto();
                 saldo.setSaldo(res.getDouble("saldo"));
                 cliente.setSaldo(saldo);
-                   
-                query = "select codprodotto from prodotti_utenti where idutente="+cliente.id;
-                Statement st = conn.createStatement();
-                ResultSet res2 = st.executeQuery(query);
-                while(res2.next())
-                {
-                    cliente.prodottiAcquistabili.add(getProdotto(res2.getInt("codprodotto")));
-                }
-                st.close();
+                cliente.setProdottiAcquistabili(getProdotti());
                 stmt.close();
                 conn.close();
                 return cliente;
@@ -192,14 +176,7 @@ public class Factory {
                 SaldoConto saldo = new SaldoConto();
                 saldo.setSaldo(res.getDouble("saldo"));
                 cliente.setSaldo(saldo);
-                   
-                query = "select codprodotto from prodotti_utenti where idutente="+cliente.id;
-                Statement st = conn.createStatement();
-                ResultSet res2 = st.executeQuery(query);
-                while(res2.next())
-                {
-                    cliente.prodottiAcquistabili.add(getProdotto(res2.getInt("codprodotto")));
-                }
+                cliente.setProdottiAcquistabili(getProdotti());
                 listaClienti.add(cliente);
             } 
             
@@ -467,6 +444,8 @@ public class Factory {
     
     public void modificaProdotto(int codProdotto, String nome, String tipo, int pezzi, double prezzo, String imgurl) throws SQLException
     {
+        try
+        {
         // path, username, password
         Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");   
         
@@ -476,8 +455,7 @@ public class Factory {
                 + "nome = ?, tipo = ?, pezzi = ?, prezzo = ?, imgurl = ? "
                 + "where cod = ?";
         
-        try
-        {
+        
            conn.setAutoCommit(false);
            updateProdotti = conn.prepareStatement(insertProdotto);           
            // Prodotti
@@ -491,44 +469,36 @@ public class Factory {
            int c2 = updateProdotti.executeUpdate();
            if(c2 != 1) conn.rollback();
            conn.commit();
-           
-           
-        }catch(SQLException e)
-        {
-            try
-            {
-                conn.rollback();
-            }catch(SQLException e2)
-            {
-                
-            }
-        }
-        finally
-        {
+        
             if(updateProdotti != null)
                 updateProdotti.close();
             
             conn.setAutoCommit(true);
             conn.close();
+        }catch (SQLException e) 
+        {
+            e.printStackTrace();
         }    
     }
     
-    public void eliminaProdotto(int codProdotto) throws SQLException
+    public void eliminaProdotto(String codProdotto, int idUtente) throws SQLException
     {
         // path, username, password
         Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");   
         
         PreparedStatement deleteProdotti = null;
         // Sql 
-        String insertProdotto = "delete from prodotti "
-                + "where cod = ?";
+        String deleteProdotto = "delete from prodotti_utenti "
+                + "where codprodotto = ? "
+                + "and idutente = ?";
         
         try
         {
            conn.setAutoCommit(false);
-           deleteProdotti = conn.prepareStatement(insertProdotto);           
+           deleteProdotti = conn.prepareStatement(deleteProdotto);           
            // Prodotti
-           deleteProdotti.setInt(1, codProdotto);
+           deleteProdotti.setInt(1, Integer.parseInt(codProdotto));
+           deleteProdotti.setInt(2, idUtente);
            
            int c2 = deleteProdotti.executeUpdate();
            if(c2 != 1) conn.rollback();
@@ -555,18 +525,32 @@ public class Factory {
         }    
     }
     
-    public void buy(int codProdotto, int idCliente) throws SQLException
+    public void buy(int codProdotto, int idCliente, String num) throws SQLException
     {
         // path, username, password
         Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");   
         
+        PreparedStatement updateProdottiCliente = null;
         PreparedStatement updateProdottiVenditore = null;
         PreparedStatement updateSaldoCliente = null;
         PreparedStatement updateSaldoVenditore = null;
-             
+        PreparedStatement updatePezziProdotto = null;
+        
+        int n=Integer.parseInt(num);
+        //controllo se è l'ultimo pezzo disponibile, nel caso verrà eliminato daglioggetti vendibili di uno dei due venditori
+        boolean pezzi = false;
+        if(getProdotto(codProdotto).getPezzi() - n < 2) {
+            pezzi = true;
+        }
+        
         // Sql 
+        
         String deleteProdottoV = "delete from prodotti_utenti "
                 + "where codprodotto = ? and idutente = ?";
+        
+        String addProdottoC = "insert into prodotti_utenti "
+                + "(codprodotto, idutente) "
+                + "values (?,?)";
         
         String updateSaldoC = "update utenti set "
                 + "saldo = ? "
@@ -576,36 +560,63 @@ public class Factory {
                 + "saldo = ? "
                 + "where id = ?";
         
+        String updatePezzi = "update prodotti set "
+                + "pezzi = ? "
+                + "where cod = ?";
+        
+        
         try
         {
            conn.setAutoCommit(false);
            
-           int idVenditore = getIdVenditoreFromProdotto(codProdotto);
+           int idVenditore = 0;
+           idVenditore = getIdVenditoreFromProdotto(codProdotto);
            Cliente cliente = getCliente(idCliente);
            Venditore venditore = getVenditore(idVenditore);
            Prodotto prodotto = getProdotto(codProdotto);
            
-           updateProdottiVenditore = conn.prepareStatement(deleteProdottoV);
+           updateProdottiCliente = conn.prepareStatement(addProdottoC);
+           if(pezzi){
+                updateProdottiVenditore = conn.prepareStatement(deleteProdottoV);
+           }
            updateSaldoCliente = conn.prepareStatement(updateSaldoC);
            updateSaldoVenditore = conn.prepareStatement(updateSaldoV);
+           updatePezziProdotto = conn.prepareStatement(updatePezzi);
            
-           // ProdottiVenditore
-           updateProdottiVenditore.setInt(1, codProdotto);
-           updateProdottiVenditore.setInt(2, idVenditore);
+           // ProdottiCliente
+           updateProdottiCliente.setInt(1, codProdotto);
+           updateProdottiCliente.setInt(2, idCliente);
+           
+           if(pezzi){
+                // ProdottiVenditore
+                updateProdottiVenditore.setInt(1, codProdotto);
+                updateProdottiVenditore.setInt(2, idVenditore);
+           }
            // SaldoCliente
            updateSaldoCliente.setDouble(1, cliente.getSaldo() - prodotto.getPrezzo() );
            updateSaldoCliente.setInt(2, idCliente);
            // SaldoVenditore
            updateSaldoVenditore.setDouble(1, venditore.getSaldo() + prodotto.getPrezzo() );
            updateSaldoVenditore.setInt(2, idVenditore);
+           // PezziProdotto
+           updatePezziProdotto.setInt(1, (getProdotto(codProdotto).getPezzi()-n) );
+           updatePezziProdotto.setInt(2, codProdotto);
            
-           int c1 = updateProdottiVenditore.executeUpdate();
+           
+           
            int c2 = updateSaldoCliente.executeUpdate();
            int c3 = updateSaldoVenditore.executeUpdate();
-           
-           if(c1 != 1 || c2 != 1 || c3 != 1 || idVenditore == 0)
-               conn.rollback();
-           
+           int c4 = updateProdottiCliente.executeUpdate();           
+           int c5 = updatePezziProdotto.executeUpdate();
+           if(pezzi){
+               int c1 = updateProdottiVenditore.executeUpdate();
+               if(c1 != 1 || c2 != 1 || c3 != 1 || c4 != 1 || c5 != 1 || idVenditore == 0)
+                   conn.rollback();
+           }
+           else{
+               if(c2 != 1 || c3 != 1 || c4 != 1 || c5 != 1 || idVenditore == 0)
+                   conn.rollback();
+           }
            conn.commit();           
         }catch(SQLException e)
         {
@@ -619,12 +630,19 @@ public class Factory {
         }
         finally
         {
-            if(updateProdottiVenditore != null)
-                updateProdottiVenditore.close();
+            
+            if(pezzi){
+                if(updateProdottiVenditore != null)
+                    updateProdottiVenditore.close();
+            }
             if(updateSaldoCliente != null)
                 updateSaldoCliente.close();
             if(updateSaldoVenditore != null)
                 updateSaldoVenditore.close();
+            if(updateProdottiCliente != null)
+                updateSaldoVenditore.close();
+            if(updatePezziProdotto != null)
+                updatePezziProdotto.close();
             
             conn.setAutoCommit(true);
             conn.close();
@@ -690,7 +708,7 @@ public class Factory {
             String query = "SELECT prodotti_utenti.idutente " 
                            + "FROM utenti " 
                            + "JOIN prodotti_utenti ON prodotti_utenti.idutente = utenti.id " 
-                           + "WHERE utenti.tipo = true and codprodotto = ?;";
+                           + "WHERE utenti.tipo = true and codprodotto = ? ";
             int counter=0;
             // Prepared Statement
             PreparedStatement stmt = conn.prepareStatement(query);
@@ -717,6 +735,56 @@ public class Factory {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public void setSaldoUtente(int id, String n, int tipo) throws SQLException {
+        
+        double incr=Double.parseDouble(n);
+        
+        // path, username, password
+        Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");   
+        
+        PreparedStatement updateSaldo = null;
+        // Sql 
+        String insertProdotto = "update utenti set "
+                + "saldo = ? "
+                + "where id = ?";
+        
+        try
+        {
+           conn.setAutoCommit(false);
+           updateSaldo = conn.prepareStatement(insertProdotto);           
+           // Prodotti
+           if(tipo==1)
+           updateSaldo.setDouble(1,(getCliente(id).getSaldo()+incr));
+           else if (tipo==0)
+           updateSaldo.setDouble(1,(getVenditore(id).getSaldo()+incr));
+           
+           updateSaldo.setInt(2, id);
+           
+           int c2 = updateSaldo.executeUpdate();
+           if(c2 != 1) conn.rollback();
+           conn.commit();
+           
+           
+        }catch(SQLException e)
+        {
+            try
+            {
+                conn.rollback();
+            }catch(SQLException e2)
+            {
+                
+            }
+        }
+        finally
+        {
+            if(updateSaldo != null)
+                updateSaldo.close();
+            
+            conn.setAutoCommit(true);
+            conn.close();
+        }    
     }
 
 }

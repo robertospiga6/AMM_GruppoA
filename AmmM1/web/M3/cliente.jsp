@@ -22,111 +22,103 @@ and open the template in the editor.
         <meta name="description" content="Milestone1">
         <meta name="author" content="Roberto Spiga">
         <link href="M3/style.css" rel="stylesheet" type="text/css" media="screen" />
+        <base href="http://localhost:8080/AmmM1/">
     </head>
     <body id="cliente">
         <c:choose>
             <c:when test="${cliente!=null}">
                 <c:choose>
-                        <c:when test="${saldoInsuff}">
-                            <div>
-                                <h2>Errore credito insufficiente</h2>
+                    <c:when test="${saldoInsuff}">
+                        <div>
+                            <h2>Errore credito insufficiente</h2>
+                        </div>      
+                        <jsp:include page='sidebarC.jsp'/>
+                    </c:when>
+                    <c:when test="${conferma}">
+                        <div>
+                            <h2>Acquisto confermato</h2>
+                        </div>       
+                        <jsp:include page='sidebarC.jsp'/>
+                    </c:when>
+                    <c:when test="${riepilogo}">
+                        <div id="resoconto">
+                            <p>Nome prodotto : ${prodotto.nome}</p>
+                            <p>Tipologia prodotto : ${prodotto.tipologia}</p>
+                            <p>Prezzo prodotto : ${prodotto.prezzo}</p>
+                            <p>Pezzi prodotto : ${prodotto.pezzi}</p>
+                        </div>
+                        <form class="conferma" method="post" action="cliente.html?codProdotto=${prodotto.getCod()}&conferma=ok&id=${cliente.id}">
+                            <p>Quanti pezzi vuoi acquistarne?
+                                <select name="NumeroPezzi" >
+                                    <option value="1" selected="selected"> 1 </option>
+                                    <c:forEach begin="2" end="${prodotto.getPezzi()}" var="n" >
+                                        <option value="${n}"> ${n} </option>
+                                    </c:forEach>
+                                </select>
+                            </p>
+                            <button type="submit" name="Conferma">Conferma</button>
+                        </form>
+                        <jsp:include page='sidebarC.jsp'/>
+                    </c:when>
+                    <c:otherwise>
+                        <!-- Container -->
+                        <div class="container">
+
+                            <!-- Header -->
+                            <div class="header">
+                                Benvenuto ${cliente.username}
+                                <h1>Prodotti</h1>
+                                <form method="post" action="login.html">
+                                    <button type="submit" name="LogOut">Esci</button>
+                                </form> 
                             </div>
-                        </c:when>
-                        <c:when test="${conferma}">
-                            <div>
-                                <h2>Acquisto confermato</h2>
+
+                            <!-- Content -->
+                            <div class="content">
+                                <table id="tabella">
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Foto</th>
+                                        <th>Pezzi</th>
+                                        <th>Prezzo</th>
+                                        <th>Aggiungi al Carrello</th>
+                                    </tr>
+                                    <c:forEach var="prodotto" items="${cliente.prodottiAcquistabili}">
+                                        <c:if test="${prodotto.cod%2 != 0}">
+                                            <tr class="disp">
+                                        </c:if>
+                                        <c:if test="${prodotto.cod%2 == 0}">
+                                            <tr class="pari">        
+                                        </c:if>
+                                                <td>${prodotto.nome}</td>
+                                                <!-- Immagine -->
+                                                <td><img src="M3/img/${prodotto.imgurl}" title="${prodotto.nome}" alt="${prodotto.imgurl}"></td>
+                                                <td>${prodotto.pezzi}</td>
+                                                <td>${prodotto.prezzo}</td>
+                                                <td><a href="cliente.html?codProdotto=${prodotto.getCod()}&id=${cliente.id}">${prodotto.nome}</a></td>
+                                            </tr>
+                                    </c:forEach>
+                                </table>          
                             </div>
-                        </c:when>
-                        <c:when test="${riepilogo}">
-                            <div>
-                                <h2>Riepilogo dati prodotto</h2>                               
-                                <p>
-                                    <img title="${prodotto.getNome()}" src="M3/img/${prodotto.getImgurl()}" alt="${prodotto.getNome()}" width="96" height="96">
-                                </p>
-                                <p>
-                                    <strong>Nome:</strong> ${prodotto.getNome()}
-                                </p>
-                                <p>
-                                    <strong>Descrizione:</strong> ${prodotto.getTipologia()}
-                                </p>
-                                <p>
-                                    <strong>Prezzo:</strong> € ${prodotto.getPrezzo()}
-                                </p>
-                                <p>
-                                    <strong>Quantità:</strong> ${prodotto.getPezzi()} pezzi
-                                </p>
-                                <form class="conferma" method="post" action="cliente.html?codProdotto=${prodotto.getCod()}&conferma=ok&username=${cliente.username}">
-                                    <button type="submit" name="Conferma">Conferma</button>
-                                </form>
+
+                            <!-- Sidebar -->
+                            <div class="sidebar">        
+                                <jsp:include page='sidebarC.jsp'/>
+                                <c:if test="${ricaricaFatta}">
+                                    <p>
+                                        Ricarica Effettuata
+                                    </p>
+                                </c:if>
                             </div>
-                        </c:when>
-                        <c:otherwise>
-                            <!-- Container -->
-                            <div class="container">
-
-                                    <!-- Header -->
-                                <div class="header">
-                                    Benvenuto ${cliente.username}
-                                    <h1>Prodotti</h1>
-                                </div>
-
-                                <!-- Content -->
-                                <div class="content">
-                                    <table id="tabella">
-                                        <tr>
-                                            <th>Nome</th>
-                                            <th>Foto</th>
-                                            <th>Pezzi</th>
-                                            <th>Prezzo</th>
-                                            <th>Aggiungi al Carrello</th>
-                                        </tr>
-
-
-                                        <c:forEach var="prodotto" items="${cliente.prodottiAcquistabili}">
-
-                                            <c:if test="${prodotto.cod%2 != 0}">
-                                                <tr class="disp">
-                                            </c:if>
-
-                                            <c:if test="${prodotto.cod%2 == 0}">
-                                                <tr class="pari">        
-                                             </c:if>
-
-                                                    <td>${prodotto.nome}</td>
-                                                        <!-- Immagine -->
-                                                        <td><img src="M3/img/${prodotto.imgurl}" title="${prodotto.nome}" alt="${prodotto.imgurl}"></td>
-                                                        <td>${prodotto.pezzi}</td>
-                                                        <td>${prodotto.prezzo}</td>
-                                                        <td><a href="cliente.html?codProdotto=${prodotto.getCod()}&username=${cliente.username}">${prodotto.nome}</a></td>
-                                                </tr>
-
-                                            </c:forEach>
-
-                                    </table>          
-                                </div>
-
-                                <!-- Sidebar -->
-                                <div class="sidebar">
-                                    <a href="descrizione.jsp">Descrizione</a>
-                                    <a href="login.jsp">Login</a>
-                                </div>
-
-                                <!-- Footer -->
-                                <!--
-                                <div class="footer">
-                                    Footer
-                                </div>
-                                -->
-
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </c:when>
 
             <c:otherwise>
-                <div>
-                    <h2>Errore nel caricamento della pagina, torna indietro. </h2>
-                </div>
+                    <h2>Errore accesso negato, torna indietro. </h2>
+                 
+                <a href="login.html">Login</a>
             </c:otherwise>
         </c:choose> 
     </body>

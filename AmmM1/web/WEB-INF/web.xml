@@ -11,7 +11,7 @@
     </session-config>
     <welcome-file-list>
         <welcome-file>
-            M3/descrizione.jsp
+           M3/descrizione.jsp
         </welcome-file>
     </welcome-file-list>
     
@@ -35,6 +35,15 @@
     <servlet-mapping>
         <servlet-name>VenditoreServlet</servlet-name>
         <url-pattern>/venditore.html</url-pattern>
+    </servlet-mapping>
+    
+     <servlet>
+        <servlet-name>Login</servlet-name>
+        <servlet-class>amm.milestone3.Login</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Login</servlet-name>
+        <url-pattern>/login.html</url-pattern>
     </servlet-mapping>
     
 </web-app>
