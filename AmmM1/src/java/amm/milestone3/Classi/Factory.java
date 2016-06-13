@@ -40,6 +40,48 @@ public class Factory {
     
     /* Metodi */
     
+    // Restituisce la lista di tutti gli studenti il cui nome e cognome contiene la stringa in input
+    public ArrayList<Prodotto> getProdotti(String text)
+    {
+        ArrayList<Prodotto> lista = new ArrayList<Prodotto>();
+        
+        try
+        {
+            Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");
+            String query = "select * " +
+                           "from prodotti " + 
+                           "where LOWER(nome) LIKE ? OR LOWER(tipo) LIKE ? OR nome LIKE ? OR tipo LIKE ?";         
+            PreparedStatement stmt = conn.prepareStatement(query);
+            // Assegna dati
+            text = "%"+text+"%";
+            stmt.setString(1, text);            
+            stmt.setString(2, text);
+            stmt.setString(3, text);            
+            stmt.setString(4, text);
+            ResultSet res = stmt.executeQuery();
+            
+            while(res.next())
+            {
+                Prodotto product = new Prodotto();
+                product.setCod(res.getInt("cod"));
+                product.setNome(res.getString("nome"));
+                product.setTipologia(res.getString("tipo"));
+                product.setPezzi(res.getInt("pezzi"));
+                product.setPrezzo(res.getDouble("prezzo"));
+                product.setImgurl(res.getString("imgurl"));
+                lista.add(product);
+            }
+            
+            stmt.close();
+            conn.close();
+        }
+        catch(SQLException e)
+        {}
+        
+        return lista;
+    }
+    
+    
     public Utente getUtente(String username, String password)
     {
         try
@@ -444,8 +486,7 @@ public class Factory {
     
     public void modificaProdotto(int codProdotto, String nome, String tipo, int pezzi, double prezzo, String imgurl) throws SQLException
     {
-        try
-        {
+        
         // path, username, password
         Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");   
         
@@ -455,7 +496,8 @@ public class Factory {
                 + "nome = ?, tipo = ?, pezzi = ?, prezzo = ?, imgurl = ? "
                 + "where cod = ?";
         
-        
+        try
+        {
            conn.setAutoCommit(false);
            updateProdotti = conn.prepareStatement(insertProdotto);           
            // Prodotti
@@ -469,16 +511,26 @@ public class Factory {
            int c2 = updateProdotti.executeUpdate();
            if(c2 != 1) conn.rollback();
            conn.commit();
+           
+        }catch(SQLException e)
+        {
+            try
+            {
+                conn.rollback();
+            }catch(SQLException e2)
+            {
+                
+            }
+        }
+        finally
+        {
         
             if(updateProdotti != null)
                 updateProdotti.close();
             
             conn.setAutoCommit(true);
             conn.close();
-        }catch (SQLException e) 
-        {
-            e.printStackTrace();
-        }    
+        }  
     }
     
     public void eliminaProdotto(String codProdotto, int idUtente) throws SQLException
@@ -525,7 +577,7 @@ public class Factory {
         }    
     }
     
-    public void buy(int codProdotto, int idCliente, String num) throws SQLException
+    public void buy(int codProdotto, int idCliente, int n) throws SQLException
     {
         // path, username, password
         Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");   
@@ -536,9 +588,10 @@ public class Factory {
         PreparedStatement updateSaldoVenditore = null;
         PreparedStatement updatePezziProdotto = null;
         
-        int n=Integer.parseInt(num);
         //controllo se è l'ultimo pezzo disponibile, nel caso verrà eliminato daglioggetti vendibili di uno dei due venditori
         boolean pezzi = false;
+        boolean prodotti_clienti = inRelazionePC(codProdotto, idCliente);
+        System.out.println("prodotti_clienti:"+prodotti_clienti);
         if(getProdotto(codProdotto).getPezzi() - n < 2) {
             pezzi = true;
         }
@@ -548,10 +601,12 @@ public class Factory {
         String deleteProdottoV = "delete from prodotti_utenti "
                 + "where codprodotto = ? and idutente = ?";
         
-        String addProdottoC = "insert into prodotti_utenti "
-                + "(codprodotto, idutente) "
-                + "values (?,?)";
-        
+        String addProdottoC = "";
+        if(prodotti_clienti){
+            addProdottoC = "insert into prodotti_utenti "
+                    + "(codprodotto, idutente) "
+                    + "values (?,?)";
+        }
         String updateSaldoC = "update utenti set "
                 + "saldo = ? "
                 + "where id = ?";
@@ -575,7 +630,8 @@ public class Factory {
            Venditore venditore = getVenditore(idVenditore);
            Prodotto prodotto = getProdotto(codProdotto);
            
-           updateProdottiCliente = conn.prepareStatement(addProdottoC);
+           if(prodotti_clienti) updateProdottiCliente = conn.prepareStatement(addProdottoC);
+           
            if(pezzi){
                 updateProdottiVenditore = conn.prepareStatement(deleteProdottoV);
            }
@@ -584,8 +640,10 @@ public class Factory {
            updatePezziProdotto = conn.prepareStatement(updatePezzi);
            
            // ProdottiCliente
-           updateProdottiCliente.setInt(1, codProdotto);
-           updateProdottiCliente.setInt(2, idCliente);
+           if(prodotti_clienti){
+                updateProdottiCliente.setInt(1, codProdotto);
+                updateProdottiCliente.setInt(2, idCliente);
+           }
            
            if(pezzi){
                 // ProdottiVenditore
@@ -593,10 +651,10 @@ public class Factory {
                 updateProdottiVenditore.setInt(2, idVenditore);
            }
            // SaldoCliente
-           updateSaldoCliente.setDouble(1, cliente.getSaldo() - prodotto.getPrezzo() );
+           updateSaldoCliente.setDouble(1, cliente.getSaldo() - prodotto.getPrezzo()*n );
            updateSaldoCliente.setInt(2, idCliente);
            // SaldoVenditore
-           updateSaldoVenditore.setDouble(1, venditore.getSaldo() + prodotto.getPrezzo() );
+           updateSaldoVenditore.setDouble(1, venditore.getSaldo() + prodotto.getPrezzo()*n );
            updateSaldoVenditore.setInt(2, idVenditore);
            // PezziProdotto
            updatePezziProdotto.setInt(1, (getProdotto(codProdotto).getPezzi()-n) );
@@ -605,16 +663,26 @@ public class Factory {
            
            
            int c2 = updateSaldoCliente.executeUpdate();
-           int c3 = updateSaldoVenditore.executeUpdate();
-           int c4 = updateProdottiCliente.executeUpdate();           
+           int c3 = updateSaldoVenditore.executeUpdate();          
            int c5 = updatePezziProdotto.executeUpdate();
-           if(pezzi){
+           if(pezzi & prodotti_clienti){
                int c1 = updateProdottiVenditore.executeUpdate();
+               int c4 = updateProdottiCliente.executeUpdate(); 
                if(c1 != 1 || c2 != 1 || c3 != 1 || c4 != 1 || c5 != 1 || idVenditore == 0)
                    conn.rollback();
            }
-           else{
-               if(c2 != 1 || c3 != 1 || c4 != 1 || c5 != 1 || idVenditore == 0)
+           else if(pezzi){
+               int c1 = updateProdottiVenditore.executeUpdate();
+               if(c1 != 1 || c2 != 1 || c3 != 1 || c5 != 1 || idVenditore == 0)
+                   conn.rollback();
+           }
+           else if(prodotti_clienti){
+           int c4 = updateProdottiCliente.executeUpdate(); 
+               if(c4 != 1 || c2 != 1 || c3 != 1 || c5 != 1 || idVenditore == 0)
+                   conn.rollback();
+           }
+           else{ 
+               if(c2 != 1 || c3 != 1 || c5 != 1 || idVenditore == 0)
                    conn.rollback();
            }
            conn.commit();           
@@ -639,8 +707,9 @@ public class Factory {
                 updateSaldoCliente.close();
             if(updateSaldoVenditore != null)
                 updateSaldoVenditore.close();
-            if(updateProdottiCliente != null)
-                updateSaldoVenditore.close();
+            
+            if(prodotti_clienti) if(updateProdottiCliente != null) updateProdottiCliente.close(); 
+                
             if(updatePezziProdotto != null)
                 updatePezziProdotto.close();
             
@@ -785,6 +854,41 @@ public class Factory {
             conn.setAutoCommit(true);
             conn.close();
         }    
+    }
+
+    private boolean inRelazionePC(int codProdotto, int idCliente) {
+        boolean i=false;
+        try 
+        {
+            // path, username, password
+            Connection conn = DriverManager.getConnection(connectionString, "robertospiga", "0000");
+            String query = "SELECT * " 
+                           + "FROM prodotti_utenti "
+                           + "WHERE codprodotto = ? " 
+                           + "AND idutente = ?";
+            // Prepared Statement
+            PreparedStatement stmt = conn.prepareStatement(query);
+            // Si associano i valori
+            stmt.setInt(1, codProdotto);
+            stmt.setInt(2, idCliente);
+            
+            // Esecuzione query
+            ResultSet res = stmt.executeQuery();
+            // ciclo sulle righe restituite
+            i=res.next();
+            System.out.println("RES1:"+res.next());
+            System.out.println("i:"+i);
+            
+            
+            stmt.close();
+            conn.close();
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+            
+        }
+        return !i;
     }
 
 }

@@ -74,8 +74,9 @@ public class ClienteServlet extends HttpServlet {
             //controllo se è stato premuto il pulsante conferma
             if (request.getParameter("Conferma") != null) {
                 //controllo se il saldo è sufficiente
-                if(x.getSaldo() >= a.getPrezzo()){
-                    Factory.getInstance().buy(a.getCod(), x.getId(), request.getParameter("NumeroPezzi"));
+                int n = Integer.parseInt(request.getParameter("NumeroPezzi"));
+                if(x.getSaldo() >= a.getPrezzo()*n){
+                    Factory.getInstance().buy(a.getCod(), x.getId(), n);
                     request.setAttribute("conferma", true); //variabile d'accesso alla pagina
                     request.setAttribute("riepilogo", false); //variabile d'accesso alla pagina
                     request.setAttribute("saldoInsuff", false); //variabile d'accesso alla pagina
@@ -86,7 +87,8 @@ public class ClienteServlet extends HttpServlet {
                 }
             }
         }
-            
+        ArrayList<Prodotto> listaProdotti = Factory.getInstance().getProdotti();
+        request.setAttribute("listaProdotti", listaProdotti);
         request.getRequestDispatcher("M3/cliente.jsp").forward(request, response);
     }
       

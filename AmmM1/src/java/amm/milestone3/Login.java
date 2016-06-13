@@ -9,6 +9,7 @@ import amm.milestone3.Classi.Factory;
 import amm.milestone3.Classi.Cliente;
 import amm.milestone3.Classi.Utente;
 import amm.milestone3.Classi.Factory;
+import amm.milestone3.Classi.Prodotto;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -75,6 +76,8 @@ public class Login extends HttpServlet {
             }
             else if(session.getAttribute("tipoUtente").equals("cliente")){
                 Utente u = Factory.getInstance().getCliente((int)session.getAttribute("idUtente"));
+                ArrayList<Prodotto> listaProdotti = Factory.getInstance().getProdotti();
+                request.setAttribute("listaProdotti", listaProdotti);
                 request.setAttribute("cliente", u);
                 request.getRequestDispatcher("M3/cliente.jsp").forward(request, response);  
             }
@@ -98,6 +101,8 @@ public class Login extends HttpServlet {
                     { 
                         request.setAttribute("cliente", u);
                         session.setAttribute("tipoUtente", "cliente");
+                        ArrayList<Prodotto> listaProdotti = Factory.getInstance().getProdotti();
+                        request.setAttribute("listaProdotti", listaProdotti);
                         request.getRequestDispatcher("M3/cliente.jsp").forward(request, response);
                     }
                     else

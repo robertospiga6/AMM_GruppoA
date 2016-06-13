@@ -23,6 +23,11 @@ and open the template in the editor.
         <meta name="author" content="Roberto Spiga">
         <link href="M3/style.css" rel="stylesheet" type="text/css" media="screen" />
         <base href="http://localhost:8080/AmmM1/">
+        
+        <!-- jQuery -->
+        <script type="text/javascript" src="M3/js/jquery-2.2.4.min.js"></script>
+        <script type="text/javascript" src="M3/js/javascript.js"></script>
+    
     </head>
     <body id="cliente">
         <c:choose>
@@ -66,11 +71,13 @@ and open the template in the editor.
 
                             <!-- Header -->
                             <div class="header">
-                                Benvenuto ${cliente.username}
+                                Benvenuto ${cliente.getUsername()}
                                 <h1>Prodotti</h1>
                                 <form method="post" action="login.html">
                                     <button type="submit" name="LogOut">Esci</button>
-                                </form> 
+                                </form>
+                                <label for="ricerca">Filtra</label>
+                                <input type="text" id="ricerca" size="15"/>
                             </div>
 
                             <!-- Content -->
@@ -83,20 +90,24 @@ and open the template in the editor.
                                         <th>Prezzo</th>
                                         <th>Aggiungi al Carrello</th>
                                     </tr>
-                                    <c:forEach var="prodotto" items="${cliente.prodottiAcquistabili}">
-                                        <c:if test="${prodotto.cod%2 != 0}">
-                                            <tr class="disp">
-                                        </c:if>
-                                        <c:if test="${prodotto.cod%2 == 0}">
-                                            <tr class="pari">        
-                                        </c:if>
-                                                <td>${prodotto.nome}</td>
+                                    <c:set var="nR" value="0" scope="page" />
+                                    <c:forEach var="prodotto" items="${listaProdotti}">
+                                        <c:choose>
+                                            <c:when test="${nR%2==0}" >
+                                                <tr class="pari">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <tr class="disp">
+                                            </c:otherwise>
+                                        </c:choose>
+                                                <td>${prodotto.getNome()}</td>
                                                 <!-- Immagine -->
-                                                <td><img src="M3/img/${prodotto.imgurl}" title="${prodotto.nome}" alt="${prodotto.imgurl}"></td>
-                                                <td>${prodotto.pezzi}</td>
-                                                <td>${prodotto.prezzo}</td>
-                                                <td><a href="cliente.html?codProdotto=${prodotto.getCod()}&id=${cliente.id}">${prodotto.nome}</a></td>
+                                                <td><img src="M3/img/${prodotto.getImgurl()}" title="${prodotto.getNome()}" alt="${prodotto.getImgurl()}"></td>
+                                                <td>${prodotto.getPezzi()}</td>
+                                                <td>${prodotto.getPrezzo()}</td>
+                                                <td><a href="cliente.html?id=${cliente.getId()}&codProdotto=${prodotto.getCod()}">${prodotto.getNome()}</a></td>
                                             </tr>
+                                            <c:set var="nR" value="${riga+1}" scope="page"/>
                                     </c:forEach>
                                 </table>          
                             </div>

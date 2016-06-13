@@ -26,6 +26,15 @@
         <url-pattern>/cliente.html</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+        <servlet-name>Filter</servlet-name>
+        <servlet-class>amm.milestone3.Filter</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Filter</servlet-name>
+        <url-pattern>/filter.json</url-pattern>
+    </servlet-mapping>
+    
     <!--Mapping servlet Venditore-->
     
     <servlet>
